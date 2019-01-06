@@ -73,7 +73,8 @@ func main() {
 	fmt.Printf("Azure Blob storage quick start sample\n")
 
 	// From the Azure portal, get your storage account name and key and set environment variables.
-	accountName, accountKey := os.Getenv("AZURE_STORAGE_ACCOUNT"), os.Getenv("AZURE_STORAGE_ACCESS_KEY")
+	//accountName, accountKey := os.Getenv("AZURE_STORAGE_ACCOUNT"), os.Getenv("AZURE_STORAGE_ACCESS_KEY")
+	accountName, accountKey := "xxx", "xxx=="
 	if len(accountName) == 0 || len(accountKey) == 0 {
 		log.Fatal("Either the AZURE_STORAGE_ACCOUNT or AZURE_STORAGE_ACCESS_KEY environment variable is not set")
 	}
@@ -128,7 +129,7 @@ func main() {
 			Parallelism: 16})
 		handleErrors(err)
 
-		if err := os.Rename(fullpathlist[fi], archive+"/"+relpathlist[fi]+"old"); err != nil {
+		if err := os.Rename(fullpathlist[fi], archive+"/"+relpathlist[fi]+".old"); err != nil {
 			fmt.Println(err)
 		}
 

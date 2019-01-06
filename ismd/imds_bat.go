@@ -7,7 +7,44 @@ import (
     "io/ioutil"
     "net/http"
     "time"
+    "encoding/json"
+    "github.com/sendgrid/sendgrid-go"
+    "github.com/sendgrid/sendgrid-go/helpers/mail"
+    "strconv"
 )
+type scheduledevents struct {
+    DocumentIncarnation int `json:"DocumentIncarnation"`
+    Events []Event `json:"Events"`
+}
+
+type Event struct {
+    EventType int    `json:"EventType"`
+    ResourceType string `json:"ResourceType"`
+    Resources []string `json:"Resources"`
+    EventStatus string `json:"EventStatus"`
+    NotBefore string `json:"NotBefore"`
+}   
+
+func sendAlert(event string) {
+	from := mail.NewEmail("xxx xxxx", "xxx@gmail.com")
+	subject := "[Alert] Monitoring Instance Metadata Scheduled Events"
+	to := mail.NewEmail("xxxx", "xxx@gmail.com")
+    plainTextContent := "Instance Metadata に Scheduled Eventsが登録されました。"
+    htmlContent := "<strong>Instance Metadata に Scheduled Eventsが登録されました。</strong>"
+    htmlContent += "<strong>"+event+"</strong>"
+	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
+	//client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
+	client := sendgrid.NewSendClient("xxxxxxx")
+	response, err := client.Send(message)
+	if err != nil {
+		log.Println(err)
+	} else {
+		fmt.Println(response.StatusCode)
+		fmt.Println(response.Body)
+		fmt.Println(response.Headers)
+    }
+}
+
 
 func main() {
 
@@ -48,4 +85,14 @@ func main() {
     }
     defer f.Close()
     fmt.Fprintln(f, line) //書き込み
+
+    e := new(scheduledevents)
+    if err := json.Unmarshal(resp_body, e);err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Println(strconv.Itoa(e.DocumentIncarnation))
+    if(len(e.Events)> 0){
+        sendAlert(line) 
+    }
 }
